@@ -51,8 +51,6 @@ asd-screening/
    jupyter lab
    ```
 
-The same steps work on macOS or Linux with `python3.11 -m venv .venv`, `source .venv/bin/activate` and the token placed at `~/.kaggle/kaggle.json`.
-
 ## Running the notebooks
 
 | Notebook | What it does |
