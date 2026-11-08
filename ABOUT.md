@@ -124,9 +124,18 @@ All figures are made at the width of a two-column paper (3.5 in for one column) 
 - **Cross-source test.** Each model is trained on the whole of one source and tested on the whole of the other, in both directions, for the two pairs where a second source exists (Thabtah and Saudi toddlers, UCI and Kaggle adults). Jaundice is left out because the Saudi data does not record it.
 - **Choosing the deployed model.** Per age group, the model with the highest mean ROC-AUC is chosen, with recall and then interpretability breaking ties. TabPFN is excluded from deployment because it needs PyTorch and a large weights file. The chosen model is retrained on all data of its group and saved together with a small background sample for the explanations.
 
-### Steps 6 to 8 (not yet in this repository)
+### Step 6. Results (notebook 06)
 
-- **Results**: result tables, Friedman and Nemenyi tests, corrected resampled t-test, fairness check by sex and ethnicity, and sanity checks (label shuffle, hold-out on the original files, rule-only baseline).
+- **Result tables.** Mean and standard deviation of accuracy, precision, recall, F1, ROC-AUC and Brier score over the 15 folds for every model and group.
+- **Baseline.** The scoring rule itself (add up the answers, apply the cut-off) is evaluated with no learning. It is right every time because it is the label, which sets the frame for reading the model scores: they measure how well a model recovers a known rule from a few hundred examples.
+- **Sanity checks.** Two controls confirm that the perfect scores come from the data and not from a leak. Shuffling the labels drops a Logistic Regression to chance level, and a hold-out split made on the raw downloaded files before any cleaning gives the same result as the cleaned pipeline.
+- **Statistical tests.** The Friedman test asks whether the six models differ at all within a group, the Nemenyi test which pairs differ, and the corrected resampled t-test compares EBM and TabPFN with every other model while allowing for the overlap between repeated folds.
+- **Missed cases.** False negatives are counted per model and group, because a missed case is the costliest error in screening.
+- **Cross-source results.** The cross-source scores are set beside the in-source cross-validated score of the same model, so the drop when the source changes can be read directly.
+- **Bias check.** Recall and false-positive rate of the chosen model per group are compared between sexes and across ethnic groups, using the out-of-fold predictions so no record is scored by a model that saw it in training.
+
+### Steps 7 and 8 (not yet in this repository)
+
 - **Explainability**: SHAP, LIME and EBM term contributions on the same predictions, with agreement between the three measured by rank correlation and top-5 overlap.
 - **Harder settings**: the models re-compared with only 4, 6 or 8 questions available and with 5–20% of answers flipped.
 

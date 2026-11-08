@@ -145,3 +145,38 @@ All models use `n_jobs=1`; parallelism is applied at the grid-search level inste
 **4. Cross-source test (RQ2).** `PAIRS` lists the four train/test directions: Thabtah toddlers and Saudi toddlers each way, UCI adults and Kaggle adults each way. `CROSS_FEATURES` drops jaundice, because the Saudi data does not record it. For every pair and model, `fit()` is called on the whole training dataset and the model is scored on the whole test dataset. Results go to `results/tables/cross_source.csv` and are shown as a train/test × model table of ROC-AUC.
 
 **5. Final model for the web app.** `PREFERENCE` orders the deployable models from most to least interpretable; TabPFN is excluded because it needs PyTorch and a large weights file. Mean ROC-AUC per model is rounded to three decimals, ties are broken by recall and then by the preference order, and the top model per group is kept in `best`. Each chosen model is retrained on all data of its group with `fit()` and saved with `joblib.dump` as a bundle: group name, model name, the fitted pipeline, the feature list, the chosen parameters and a 100-row background sample used later for SHAP explanations. The bundle is written to `results/models/<group>.joblib` and copied into the app folder. The last cell writes the summary tables the app displays: mean and standard deviation of every metric per group and model, the cross-source table and the chosen models.
+
+---
+
+## 06_results.ipynb
+
+Turns the per-fold scores saved by notebook 05 into the tables, figures and statistical tests for RQ1 and RQ2. Nothing is trained here except the small controls in the sanity checks.
+
+**Setup.** Loads `cv_folds.csv` and `cross_source.csv`. `METRICS` lists the six scores reported. The figure style is the same as notebook 04. `SHORT` maps the model names to the abbreviations used in figures.
+
+**1. Main results.** Groups the folds by age group and model, takes mean and standard deviation of every metric, formats them as "mean ± sd", orders the rows as `GROUPS × MODEL_NAMES` and saves `results/tables/main_results.csv`.
+
+**2. Baseline: the scoring rule itself.** For each group, adds up A1–A10, applies the cut-off and compares the result with the label. No learning is involved. The markdown below explains why the rule is right every time and what that means for reading the model scores.
+
+**2b. Sanity checks.** Two controls that show the perfect scores come from the data, not from a leak in the pipeline:
+
+- *Shuffled labels.* A plain scaled Logistic Regression is cross-validated on the real labels and again on randomly permuted labels. If anything leaked between folds the shuffled score would stay high; it should fall to about 0.5.
+- *Raw-file hold-out.* The four raw downloaded files are read again with the same `read_arff()` as notebook 02, with no cleaning at all. A random 20% hold-out is split off before anything else happens, and a Logistic Regression on the ten answers only is fitted on the rest and scored on the hold-out.
+
+The three AUCs per group go to `results/tables/sanity_checks.csv`.
+
+**3. Spread across folds.** For ROC-AUC and recall, a 2×2 grid of horizontal box plots (one panel per group, one box per model) showing how the 15 fold scores spread. Saved as `fig_cv_roc_auc` and `fig_cv_recall`.
+
+**4. Are the differences real?** Three tests:
+
+- *Friedman test* per group and metric (ROC-AUC and F1): the fold scores are pivoted to a folds × models table and `friedmanchisquare()` tests whether the six models differ overall, with folds as blocks.
+- *Nemenyi post-hoc test*: `posthoc_nemenyi_friedman()` on the same table gives a p-value for every pair of models. Drawn as a 2×2 grid of heatmaps, saved as `fig_nemenyi_roc_auc`.
+- *Corrected resampled t-test*: `corrected_ttest(a, b)` implements the Nadeau–Bengio correction, inflating the variance of the fold differences by `1/n + test_frac/(1 − test_frac)` because folds from repeated cross-validation share training data. It is run for EBM and TabPFN against every other model on ROC-AUC, and the table flags pairs with p < 0.05. The markdown explains why the plain Friedman p-values are a little too small.
+
+**5. Missed cases.** Sums the confusion-matrix counts over the 15 folds per group and model and computes the share of positive cases missed (false negatives). Each record appears three times because of the three repeats.
+
+**6. Cross-source results (RQ2).** Adds an "in-source AUC" column to the cross-source table (the cross-validated ROC-AUC of the same model on its training source) so the drop can be read directly. Then a grouped bar chart of ROC-AUC per train→test pair and model, saved as `fig_cross_source`.
+
+**7. Bias check.** Loads the out-of-fold predictions and the chosen model per group. `rates(df)` returns the number of people, recall and false-positive rate at the 0.5 threshold. Predictions are joined back to the processed data by row index, ethnic groups with fewer than 20 people (60 prediction rows, because of the three repeats) are merged into "Other/Unknown", sex is labelled, and the rates are computed for every value of sex and ethnicity for the model chosen for that group.
+
+**8. Answers.** Markdown only: the answers to RQ1 and RQ2 drawn from the tables above, with the numbers that support each point.

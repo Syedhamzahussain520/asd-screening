@@ -1,0 +1,5 @@
+group,model,roc_auc,recall,f1,accuracy
+toddler,EBM,1.0,1.0,1.0,1.0
+child,EBM,1.0,1.0,1.0,1.0
+adolescent,Logistic Regression,0.9877314814814814,0.9722222222222221,0.9343627805366935,0.9180952380952382
+adult,EBM,1.0,1.0,1.0,1.0

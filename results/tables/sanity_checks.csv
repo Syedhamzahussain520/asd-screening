@@ -1,0 +1,5 @@
+group,"LR AUC, real labels","LR AUC, shuffled labels",raw hold-out AUC,raw hold-out errors,raw hold-out size
+toddler,1.0,0.523224501471069,1.0,0,210
+child,1.0,0.5020483348069555,1.0,0,58
+adolescent,0.9854166666666668,0.47199074074074077,1.0,0,20
+adult,1.0,0.5084774932183203,1.0,0,140
