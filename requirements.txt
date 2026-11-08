@@ -1,0 +1,8 @@
+# Data stage (notebooks 01-03). Python 3.11.
+numpy==2.2.6
+pandas==2.3.3
+requests==2.34.2
+kaggle==2.2.4
+
+jupyterlab==4.6.4
+ipykernel==7.4.0
