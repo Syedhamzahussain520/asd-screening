@@ -4,7 +4,7 @@ Code for the MSc project *"Early Autism Screening Using Interpretable Machine Le
 
 The project compares interpretable machine learning models for autism (ASD) screening in four age groups (toddler, child, adolescent, adult) using public questionnaire datasets, and will deliver the chosen models through a web based screening tool.
 
-This repository is being built up stage by stage. At the moment it contains the data stage: downloading the datasets, understanding what they contain and preparing them for modelling.
+This repository is being built up stage by stage. At the moment it contains the data stage (downloading the datasets, understanding what they contain and preparing them for modelling) and the exploratory data analysis.
 
 ## Project layout
 
@@ -13,10 +13,13 @@ asd-screening/
 ├── notebooks/
 │   ├── 01_download_data.ipynb            download all six datasets into data/raw/
 │   ├── 02_understanding_the_data.ipynb   columns, questionnaires, how the label was made
-│   └── 03_preprocessing.ipynb            cleaning and harmonising -> data/processed/
+│   ├── 03_preprocessing.ipynb            cleaning and harmonising -> data/processed/
+│   └── 04_eda.ipynb                      exploratory data analysis -> results/figures/
 ├── data/
 │   ├── raw/                              created by notebook 01 (not in the repository)
 │   └── processed/                        six cleaned CSV files, one per dataset
+├── results/
+│   └── figures/                          EDA figures (PNG, sized for a two-column paper)
 ├── requirements.txt
 └── README.md
 ```
@@ -57,8 +60,9 @@ The same steps work on macOS or Linux with `python3.11 -m venv .venv`, `source .
 | `01_download_data` | Downloads the four Thabtah ASDTests datasets (UCI and Kaggle) plus two datasets from other sources into `data/raw/` | about a minute |
 | `02_understanding_the_data` | Looks at the columns, the Q-CHAT-10 / AQ-10 questionnaires and checks how the class label was produced | seconds |
 | `03_preprocessing` | Harmonises the six files to one schema (A1–A10 answers, age, sex, jaundice, family history), cleans ages, removes duplicates and writes `data/processed/*.csv` | seconds |
+| `04_eda` | Class balance, age and score distributions, answer rates per question, question correlations and chi-square tests, saved as PNG figures in `results/figures/` | about a minute |
 
-The processed CSV files are included in the repository, so notebooks 02 and 03 can be skipped if you only need the cleaned data.
+The processed CSV files and the EDA figures are included in the repository, so notebooks 02–04 can be skipped if you only need the cleaned data.
 
 ## Note on the data
 
