@@ -4,6 +4,8 @@ Code for the MSc project *"Early Autism Screening Using Interpretable Machine Le
 
 The project compares interpretable machine learning models for autism (ASD) screening in four age groups (toddler, child, adolescent, adult) using public questionnaire datasets, and will deliver the chosen models through a web based screening tool.
 
+See [ABOUT.md](ABOUT.md) for the background: the problem, previous work, the research gap and how each part of the study is handled.
+
 This repository is being built up stage by stage. At the moment it contains the data stage (downloading the datasets, understanding what they contain and preparing them for modelling) and the exploratory data analysis.
 
 ## Project layout
@@ -21,7 +23,8 @@ asd-screening/
 ├── results/
 │   └── figures/                          EDA figures (PNG, sized for a two-column paper)
 ├── requirements.txt
-└── README.md
+├── README.md
+└── ABOUT.md                              background, previous work and approach
 ```
 
 ## Setup on Windows
