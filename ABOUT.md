@@ -69,6 +69,57 @@ Deep neural networks are not included. On small tables of yes/no answers they ha
 
 **Reproducibility.** Everything runs from numbered notebooks with fixed random seeds and pinned package versions. Data download, cleaning, analysis, modelling and results are separate notebooks so each step can be checked on its own.
 
+## Methodology, step by step
+
+The work is split into numbered notebooks. Each step reads what the previous one saved, so any step can be checked on its own.
+
+### Step 1. Downloading the data (notebook 01)
+
+- The four main datasets are fetched directly: children, adolescents and adults from the UCI Machine Learning Repository as zip files, toddlers from Kaggle through the Kaggle API.
+- Two second-source datasets, Saudi toddlers and the Kaggle adult dataset, are fetched the same way. They are used only to test the models on data from somewhere else.
+- Every file is stored under `data/raw/<dataset>/` together with the description document written by the dataset authors. These documents were used to understand the columns in the next step.
+- The Kaggle adult data comes from a competition and has a test file without labels, so only its training file is used.
+
+### Step 2. Understanding the data (notebook 02)
+
+- The UCI files are in ARFF format. The standard reader fails on them because of quoted values with trailing spaces, so the part after the `@data` line is read as plain CSV, with `?` treated as missing.
+- The two questionnaires are written out item by item (Q-CHAT-10 for toddlers, AQ-10 for the other groups) with their scoring: for Q-CHAT-10, items A1–A9 score 1 for the two "less typical" answers and A10 for the two "more typical" ones; for AQ-10 the scoring direction differs per item. In the files the answers are already scored as 0/1.
+- Every column is listed with a decision on whether it can be a model input. The score column is the sum of the ten answers; country, relation, whether the app was used before and the age band are not about the person or are constant; ethnicity is kept aside for the bias check only.
+- Missing values are counted. They occur only in age, ethnicity and relation, so only age matters for modelling.
+- The class label is checked against the scoring rule for every row of every dataset. In the five ASDTests and Saudi datasets the label equals "score above the cut-off" without a single exception. The Kaggle adult data agrees with the rule in about four rows out of five, so it is the only dataset where the label is not a pure function of the answers.
+- Conclusion recorded for the later steps: the score column must be dropped, near-perfect accuracy is expected even then, and the label is a screening result rather than a diagnosis.
+
+### Step 3. Preprocessing (notebook 03)
+
+What was cleaned, and why:
+
+- **One schema for all six files.** The toddler files use their own column names and the others follow the UCI layout, with some names misspelt in the original (`jundice`, `austim`, `contry_of_res`). Everything is renamed to A1–A10, `age`, `male`, `jaundice`, `family_asd`, `ethnicity`, `score`, `asd`. Yes/no fields become 0/1 and gender becomes `male` (1 = male). The Saudi data has no jaundice or ethnicity columns, so those are left empty.
+- **Exact duplicates removed.** After dropping the ID column some records are exact copies. With a few hundred rows, a copied record landing in both a training and a test fold inflates the results, so duplicates are dropped.
+- **Age.** A few ages are missing, the adult file contains an age of 383, and the Kaggle adult file, though labelled "18 and more", contains ages from 2 to 89. Each dataset is restricted to the age range of its questionnaire: 12–36 months for toddlers, 4–11 years for children, 12–16 for adolescents, 17 and over for adults. Rows outside the range or with no age are dropped.
+- **Ethnicity tidied.** Spellings are made consistent (`White-European` and `White European`, `others` and `Others`), and missing values become `Unknown`. Ethnicity is never a model input; it is kept only to check later whether the models make more mistakes for some groups.
+- **Model inputs fixed.** The ten answers plus age, sex, jaundice and family history are the features. The score column is dropped because the label is computed from it. Country, relation, app use and age band are dropped. All inputs except age are already 0/1, so no one-hot encoding is needed.
+- **Nothing that learns from the data is done here.** Scaling and oversampling are left to the model pipeline, so they are fitted on training folds only.
+- Six cleaned CSV files are saved to `data/processed/`, one per dataset, with a before/after row count and the class balance of each.
+
+### Step 4. Exploratory data analysis (notebook 04)
+
+All figures are made at the width of a two-column paper (3.5 in for one column) and saved as PNG in `results/figures/`.
+
+- **Class balance** per age group. The groups are imbalanced in different directions: most toddlers screened positive, most adults did not, children are close to even. The adolescent set is the smallest, so its results will vary the most. This is why oversampling is applied inside the training folds later.
+- **Age distribution** by class for each group, to see whether age separates the classes. It does not in any obvious way.
+- **Questionnaire score** by class, with the app's cut-off drawn in. The two classes never overlap: everything above the line is "ASD traits". This is the leakage finding of step 2 shown as a picture.
+- **Answer rates**: the share of people scoring 1 on each question, by group and class. Some questions separate the classes strongly (for adults A6 and A9), others are scored 1 by both classes (A1 and A8 in adults, A10 in toddlers). These differences are what the explanation methods pick up later.
+- **Chi-square test** of every input against the label. With these sample sizes nearly every question is highly significant, so the chi-square statistic is used to rank questions rather than the p-value. The same test, run on the training fold only, is used later to choose the reduced question sets.
+- **Correlation between questions** (phi coefficient for 0/1 data) for each group, to see whether answers cluster.
+- **Personal details**: share of positive screens by sex, jaundice and family history. In adults, family history and jaundice go with a positive screen; in toddlers boys screen positive a little more often; for children and adolescents there is no clear link.
+
+### Steps 5 to 8 (not yet in this repository)
+
+- **Model training**: six models, repeated stratified 5-fold cross-validation with 3 repeats, hyperparameters tuned by nested cross-validation inside each training fold, SMOTENC and scaling inside the pipeline, cross-source test, and the final model per age group saved for the web tool.
+- **Results**: result tables, Friedman and Nemenyi tests, corrected resampled t-test, fairness check by sex and ethnicity, and sanity checks (label shuffle, hold-out on the original files, rule-only baseline).
+- **Explainability**: SHAP, LIME and EBM term contributions on the same predictions, with agreement between the three measured by rank correlation and top-5 overlap.
+- **Harder settings**: the models re-compared with only 4, 6 or 8 questions available and with 5–20% of answers flipped.
+
 ## Data
 
 | Dataset | Questionnaire | Role |
