@@ -6,7 +6,7 @@ The project compares interpretable machine learning models for autism (ASD) scre
 
 See [ABOUT.md](ABOUT.md) for the background (the problem, previous work, the research gap and how each part of the study is handled) and [NOTEBOOKS.md](NOTEBOOKS.md) for a section-by-section walk-through of the code in each notebook.
 
-This repository is being built up stage by stage. At the moment it contains the data stage (downloading the datasets, understanding what they contain and preparing them for modelling) and the exploratory data analysis.
+This repository is being built up stage by stage. At the moment it contains the data stage (downloading the datasets, understanding what they contain and preparing them for modelling), the exploratory data analysis and the model training.
 
 ## Project layout
 
@@ -16,12 +16,15 @@ asd-screening/
 │   ├── 01_download_data.ipynb            download all six datasets into data/raw/
 │   ├── 02_understanding_the_data.ipynb   columns, questionnaires, how the label was made
 │   ├── 03_preprocessing.ipynb            cleaning and harmonising -> data/processed/
-│   └── 04_eda.ipynb                      exploratory data analysis -> results/figures/
+│   ├── 04_eda.ipynb                      exploratory data analysis -> results/figures/
+│   └── 05_model_training.ipynb           nested cross-validation, cross-source test, final models
 ├── data/
 │   ├── raw/                              created by notebook 01 (not in the repository)
 │   └── processed/                        six cleaned CSV files, one per dataset
 ├── results/
-│   └── figures/                          EDA figures (PNG, sized for a two-column paper)
+│   ├── figures/                          EDA figures (PNG, sized for a two-column paper)
+│   ├── tables/                           per-fold scores, out-of-fold predictions, cross-source scores
+│   └── models/                           one trained model per age group (joblib)
 ├── requirements.txt
 ├── README.md
 ├── ABOUT.md                              background, previous work and approach
@@ -63,8 +66,11 @@ asd-screening/
 | `02_understanding_the_data` | Looks at the columns, the Q-CHAT-10 / AQ-10 questionnaires and checks how the class label was produced |
 | `03_preprocessing` | Harmonises the six files to one schema (A1–A10 answers, age, sex, jaundice, family history), cleans ages, removes duplicates and writes `data/processed/*.csv` |
 | `04_eda` | Class balance, age and score distributions, answer rates per question, question correlations and chi-square tests, saved as PNG figures in `results/figures/` |
+| `05_model_training` | Compares Logistic Regression, Random Forest, XGBoost, LightGBM, EBM and TabPFN with repeated stratified 5-fold cross-validation (hyperparameters tuned inside each training fold, SMOTENC on training data only), runs the cross-source test, and saves the best model per age group to `results/models/` |
 
-The processed CSV files and the EDA figures are included in the repository, so notebooks 02–04 can be skipped if you only need the cleaned data.
+The processed CSV files, the EDA figures, the cross-validation tables and the trained models are all included in the repository, so any notebook can be opened and read without rerunning the ones before it. Notebook 05 is the slow one; it has a `RERUN` flag at the top, and with `RERUN = False` it loads the saved tables from `results/tables/` instead of training again.
+
+**TabPFN.** Version 2.0.9 is pinned because it is the version described in the Nature paper and downloads its weights without a login; newer releases ask you to accept a licence first. Installing it pulls in PyTorch, which is a large download. The weights are fetched the first time the model is used. Notebook 05 imports TabPFN before XGBoost and LightGBM on purpose, because loading them the other way round can crash the kernel.
 
 ## Note on the data
 

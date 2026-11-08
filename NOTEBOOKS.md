@@ -117,3 +117,31 @@ Exploratory analysis of the four cleaned main datasets. Every figure is saved as
 **7. Personal details.** A table of the share of positive screens for male vs female, jaundice vs none and family history vs none, per group.
 
 **Summary.** Markdown with the findings (balance per group, perfect separation at the cut-off, which questions separate the classes most and least, which personal details relate to the label) and a table suggesting the size of each figure in the paper.
+
+---
+
+## 05_model_training.ipynb
+
+Trains and compares the six models for every age group, runs the cross-source test and saves the final model per group. Everything that learns from data happens inside a pipeline that is fitted on the training fold only.
+
+**Setup.** TabPFN is imported first on purpose (see the comment in the cell). Then scikit-learn (models, metrics, cross-validation, scaler), imbalanced-learn (`SMOTENC` and its `Pipeline`, which knows that oversampling must only run at fit time), InterpretML (`ExplainableBoostingClassifier`), XGBoost and LightGBM. Output folders are created. `SEED = 42` fixes every random choice. `RERUN = True` trains from scratch; `False` reads the saved tables. The six processed CSVs are loaded into `data`.
+
+**1. Models and parameter grids.** `get_classifier(name)` returns a model object and its small grid of hyperparameters:
+
+- Logistic Regression: regularisation strength `C`.
+- Random Forest: number of trees and maximum depth.
+- XGBoost and LightGBM: number of trees, depth or number of leaves, learning rate.
+- EBM: whether to allow pairwise interaction terms (0 or 10).
+- TabPFN: no grid; it has no hyperparameters to tune. `ignore_pretraining_limits=True` lets it run on more than 1,000 rows on CPU, which the toddler training folds exceed after oversampling.
+
+All models use `n_jobs=1`; parallelism is applied at the grid-search level instead, which avoids clashes between the libraries.
+
+`make_pipeline(name, features)` wraps the model in a pipeline: SMOTENC first (every feature except age is marked categorical), then a `StandardScaler` for Logistic Regression only, then the classifier. The grid keys are prefixed with `clf__` so `GridSearchCV` knows they belong to the last step.
+
+**2. Training and scoring helpers.** `fit(name, X, y, features)` builds the pipeline and, if there is a grid, runs `GridSearchCV` with an inner stratified 3-fold split scored by ROC-AUC, returning the best pipeline and its parameters. It is only ever called with training data, so the test fold never influences tuning, scaling or oversampling. `scores(y_true, prob)` turns predicted probabilities into a row of metrics: accuracy, precision, recall, F1, ROC-AUC, Brier score and the four confusion-matrix counts, using 0.5 as the decision threshold.
+
+**3. Nested cross-validation (RQ1).** `nested_cv(name, df, features)` makes a `RepeatedStratifiedKFold` with 5 folds and 3 repeats (15 test folds). For each fold it calls `fit()` on the training part, predicts probabilities for the test part, records the scores with the chosen parameters, and keeps the out-of-fold predictions (row index, repeat number, probability) for the fairness check in notebook 06. The loop below runs this for every group and every model, printing the mean ROC-AUC and recall as it goes, and writes `results/tables/cv_folds.csv` (one row per model per fold) and `results/tables/cv_predictions.csv` (one row per record per model per repeat). A grouped table of mean metrics is shown at the end.
+
+**4. Cross-source test (RQ2).** `PAIRS` lists the four train/test directions: Thabtah toddlers and Saudi toddlers each way, UCI adults and Kaggle adults each way. `CROSS_FEATURES` drops jaundice, because the Saudi data does not record it. For every pair and model, `fit()` is called on the whole training dataset and the model is scored on the whole test dataset. Results go to `results/tables/cross_source.csv` and are shown as a train/test × model table of ROC-AUC.
+
+**5. Final model for the web app.** `PREFERENCE` orders the deployable models from most to least interpretable; TabPFN is excluded because it needs PyTorch and a large weights file. Mean ROC-AUC per model is rounded to three decimals, ties are broken by recall and then by the preference order, and the top model per group is kept in `best`. Each chosen model is retrained on all data of its group with `fit()` and saved with `joblib.dump` as a bundle: group name, model name, the fitted pipeline, the feature list, the chosen parameters and a 100-row background sample used later for SHAP explanations. The bundle is written to `results/models/<group>.joblib` and copied into the app folder. The last cell writes the summary tables the app displays: mean and standard deviation of every metric per group and model, the cross-source table and the chosen models.

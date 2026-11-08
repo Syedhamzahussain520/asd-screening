@@ -115,9 +115,17 @@ All figures are made at the width of a two-column paper (3.5 in for one column) 
 - **Correlation between questions** (phi coefficient for 0/1 data) for each group, to see whether answers cluster.
 - **Personal details**: share of positive screens by sex, jaundice and family history. In adults, family history and jaundice go with a positive screen; in toddlers boys screen positive a little more often; for children and adolescents there is no clear link.
 
-### Steps 5 to 8 (not yet in this repository)
+### Step 5. Model training (notebook 05)
 
-- **Model training**: six models, repeated stratified 5-fold cross-validation with 3 repeats, hyperparameters tuned by nested cross-validation inside each training fold, SMOTENC and scaling inside the pipeline, cross-source test, and the final model per age group saved for the web tool.
+- **Six models, one pipeline.** Logistic Regression, Random Forest, XGBoost, LightGBM, EBM and TabPFN are each wrapped in the same pipeline: SMOTENC oversampling, a scaler for Logistic Regression only, then the classifier. The pipeline is fitted on the training fold only, so neither the synthetic rows nor the scaling ever see test data. The score column is not among the inputs.
+- **Repeated stratified cross-validation.** Each age group is split into 5 stratified folds, and the whole split is repeated 3 times with different shuffles, giving 15 test folds per model. Every model is scored on exactly the same folds.
+- **Nested tuning.** Inside each training fold a further 3-fold grid search picks the hyperparameters by ROC-AUC. The grids are small on purpose: regularisation strength for Logistic Regression, number and depth of trees for the tree models, whether EBM may use pairwise terms. TabPFN has nothing to tune and uses its defaults.
+- **What is recorded.** Accuracy, precision, recall, F1, ROC-AUC, the Brier score and the confusion-matrix counts per fold, plus the out-of-fold predicted probability of every record, which the fairness check uses later.
+- **Cross-source test.** Each model is trained on the whole of one source and tested on the whole of the other, in both directions, for the two pairs where a second source exists (Thabtah and Saudi toddlers, UCI and Kaggle adults). Jaundice is left out because the Saudi data does not record it.
+- **Choosing the deployed model.** Per age group, the model with the highest mean ROC-AUC is chosen, with recall and then interpretability breaking ties. TabPFN is excluded from deployment because it needs PyTorch and a large weights file. The chosen model is retrained on all data of its group and saved together with a small background sample for the explanations.
+
+### Steps 6 to 8 (not yet in this repository)
+
 - **Results**: result tables, Friedman and Nemenyi tests, corrected resampled t-test, fairness check by sex and ethnicity, and sanity checks (label shuffle, hold-out on the original files, rule-only baseline).
 - **Explainability**: SHAP, LIME and EBM term contributions on the same predictions, with agreement between the three measured by rank correlation and top-5 overlap.
 - **Harder settings**: the models re-compared with only 4, 6 or 8 questions available and with 5–20% of answers flipped.
