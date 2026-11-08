@@ -55,12 +55,12 @@ The same steps work on macOS or Linux with `python3.11 -m venv .venv`, `source .
 
 ## Running the notebooks
 
-| Notebook | What it does | Time |
-|---|---|---|
-| `01_download_data` | Downloads the four Thabtah ASDTests datasets (UCI and Kaggle) plus two datasets from other sources into `data/raw/` | about a minute |
-| `02_understanding_the_data` | Looks at the columns, the Q-CHAT-10 / AQ-10 questionnaires and checks how the class label was produced | seconds |
-| `03_preprocessing` | Harmonises the six files to one schema (A1–A10 answers, age, sex, jaundice, family history), cleans ages, removes duplicates and writes `data/processed/*.csv` | seconds |
-| `04_eda` | Class balance, age and score distributions, answer rates per question, question correlations and chi-square tests, saved as PNG figures in `results/figures/` | about a minute |
+| Notebook | What it does |
+|---|---|
+| `01_download_data` | Downloads the four Thabtah ASDTests datasets (UCI and Kaggle) plus two datasets from other sources into `data/raw/` |
+| `02_understanding_the_data` | Looks at the columns, the Q-CHAT-10 / AQ-10 questionnaires and checks how the class label was produced |
+| `03_preprocessing` | Harmonises the six files to one schema (A1–A10 answers, age, sex, jaundice, family history), cleans ages, removes duplicates and writes `data/processed/*.csv` |
+| `04_eda` | Class balance, age and score distributions, answer rates per question, question correlations and chi-square tests, saved as PNG figures in `results/figures/` |
 
 The processed CSV files and the EDA figures are included in the repository, so notebooks 02–04 can be skipped if you only need the cleaned data.
 
