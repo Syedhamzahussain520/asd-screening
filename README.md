@@ -6,7 +6,7 @@ The project compares interpretable machine learning models for autism (ASD) scre
 
 See [ABOUT.md](ABOUT.md) for the background (the problem, previous work, the research gap and how each part of the study is handled) and [NOTEBOOKS.md](NOTEBOOKS.md) for a section-by-section walk-through of the code in each notebook.
 
-This repository is being built up stage by stage. It contains the full research pipeline: data download, understanding and preprocessing, exploratory analysis, model training, results, explainability and the harder-setting experiments.
+This repository is being built up stage by stage. It contains the full research pipeline (data download, understanding and preprocessing, exploratory analysis, model training, results, explainability and the harder-setting experiments) and the Streamlit web app that serves the chosen models.
 
 ## Project layout
 
@@ -28,8 +28,13 @@ asd-screening/
 │   ├── figures/                          figures (PNG, sized for a two-column paper)
 │   ├── tables/                           per-fold scores, predictions, result and test tables
 │   └── models/                           one trained model per age group (joblib)
-├── app/
-│   └── data/                             summary tables for the web app (written by notebook 05)
+├── app/                                  Streamlit web app (runs on its own)
+│   ├── Home.py                           start page
+│   ├── pages/                            1_Screening.py, 2_Model_Performance.py, 3_About.py
+│   ├── questions.py                      questionnaire wording and scoring
+│   ├── models/                           trained models used by the app (written by notebook 05)
+│   ├── data/                             summary tables shown in the app (written by notebooks 05 and 08)
+│   └── requirements.txt                  app-only dependencies
 ├── requirements.txt
 ├── README.md
 ├── ABOUT.md                              background, previous work and approach
@@ -79,6 +84,20 @@ asd-screening/
 The processed CSV files, the EDA figures, the cross-validation tables and the trained models are all included in the repository, so any notebook can be opened and read without rerunning the ones before it. Notebooks 05 and 08 are the slow ones; each has a `RERUN` flag at the top, and with `RERUN = False` it loads its saved table from `results/tables/` instead of training again.
 
 **TabPFN.** Version 2.0.9 is pinned because it is the version described in the Nature paper and downloads its weights without a login; newer releases ask you to accept a licence first. Installing it pulls in PyTorch, which is a large download. The weights are fetched the first time the model is used. Notebooks 05 and 08 import TabPFN before XGBoost and LightGBM on purpose, because loading them the other way round can crash the kernel.
+
+## The web app
+
+The app has three pages. **Screening** asks the questionnaire for the chosen age group plus age, sex, jaundice and family history, gives a probability of ASD traits with the questionnaire score, and explains the result with SHAP values showing which answers moved the estimate up or down. **Model Performance** shows the cross-validation, cross-source and harder-setting results. **About** explains the data, the method and the limitations. Nothing entered is stored.
+
+Run it locally from the project folder, with the virtual environment active:
+
+```bat
+streamlit run app/Home.py
+```
+
+The browser opens at `http://localhost:8501`. The research environment above already contains everything the app needs. To run the app on its own, for example on another machine, install `app/requirements.txt` instead; it leaves out TabPFN and PyTorch, which the deployed models do not need.
+
+To deploy on [Streamlit Community Cloud](https://share.streamlit.io): sign in with GitHub, choose **New app**, pick this repository and branch `main`, set the main file to `app/Home.py`, and under *Advanced settings* choose **Python 3.11**. Streamlit Cloud installs `app/requirements.txt` because it sits next to the main file. Package versions are pinned to the training environment because the saved models must be loaded with the same scikit-learn version.
 
 ## Note on the data
 

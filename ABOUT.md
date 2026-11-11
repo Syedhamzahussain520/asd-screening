@@ -147,6 +147,14 @@ All figures are made at the width of a two-column paper (3.5 in for one column) 
 - **Noisy answers.** Models trained on clean data are tested after 5%, 10% or 20% of the test answers have been flipped at random, as would happen with careless or inconsistent answering.
 - **Set-up.** Six models, stratified 5-fold cross-validation repeated twice, fixed hyperparameters taken from the tuning in step 5, SMOTENC inside the pipeline as before. ROC-AUC, recall, accuracy and Brier score are recorded per fold.
 
+### Step 9. Web tool (app/)
+
+- **What it does.** A Streamlit app with three pages. The screening page asks the ten questions of the right questionnaire for the chosen age group, plus age, sex, jaundice at birth and family history, scores the answers exactly as the datasets do, and shows the model's probability of ASD traits next to the questionnaire score.
+- **Explanation with every result.** SHAP values are computed for the single submitted record against the background sample saved with the model, and shown as a bar chart of the eight answers that moved the estimate most, with a sentence naming the answers that raised and lowered it.
+- **Which model.** The model chosen in step 5 for each age group, loaded from the saved bundle. TabPFN is not deployed.
+- **Safeguards.** The result is labelled a screening aid and not a diagnosis on every page, the user is pointed to a health professional whatever the result, and nothing entered is stored or logged.
+- **Transparency.** The performance page shows the same cross-validation, cross-source and harder-setting results as the notebooks, so a user can see how the models were tested.
+
 ## Data
 
 | Dataset | Questionnaire | Role |
