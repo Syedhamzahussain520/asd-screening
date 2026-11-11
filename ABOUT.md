@@ -134,10 +134,18 @@ All figures are made at the width of a two-column paper (3.5 in for one column) 
 - **Cross-source results.** The cross-source scores are set beside the in-source cross-validated score of the same model, so the drop when the source changes can be read directly.
 - **Bias check.** Recall and false-positive rate of the chosen model per group are compared between sexes and across ethnic groups, using the out-of-fold predictions so no record is scored by a model that saw it in training.
 
-### Steps 7 and 8 (not yet in this repository)
+### Step 7. Explainability (notebook 07)
 
-- **Explainability**: SHAP, LIME and EBM term contributions on the same predictions, with agreement between the three measured by rank correlation and top-5 overlap.
-- **Harder settings**: the models re-compared with only 4, 6 or 8 questions available and with 5–20% of answers flipped.
+- **One model, three explanations.** A purely additive EBM is trained on 80% of each age group and its predictions on the other 20% are explained three ways: the EBM's own term importances (exact, read from the model), SHAP values (permutation form, model-agnostic) and LIME weights averaged over the test set.
+- **Comparing the methods.** Each method's importances are scaled to sum to one and compared per group. Agreement is measured on the ten questions only, with Spearman rank correlation and the overlap of the two top-5 sets. The personal details are excluded from the agreement measure because every method ranks them near zero.
+- **Reading the result.** Because the true rule weights all ten answers equally, the rankings describe where in this sample the answers vary near the cut-off, not which question is clinically most important. They are presented as support for explaining an individual prediction, not as a finding about autism.
+
+### Step 8. Harder settings (notebook 08)
+
+- **Why.** With all ten answers the scoring rule can be recovered exactly, so the full-questionnaire scores say little about how the models compare. Two settings with a practical meaning make the task harder.
+- **Reduced questionnaire.** In each training fold the 4, 6 or 8 questions with the largest chi-square statistic against the label are chosen (on the training fold only), the model is trained on those plus the personal details, and it must predict the full-questionnaire outcome on the test fold. This asks how much a shorter screen loses.
+- **Noisy answers.** Models trained on clean data are tested after 5%, 10% or 20% of the test answers have been flipped at random, as would happen with careless or inconsistent answering.
+- **Set-up.** Six models, stratified 5-fold cross-validation repeated twice, fixed hyperparameters taken from the tuning in step 5, SMOTENC inside the pipeline as before. ROC-AUC, recall, accuracy and Brier score are recorded per fold.
 
 ## Data
 

@@ -180,3 +180,54 @@ The three AUCs per group go to `results/tables/sanity_checks.csv`.
 **7. Bias check.** Loads the out-of-fold predictions and the chosen model per group. `rates(df)` returns the number of people, recall and false-positive rate at the 0.5 threshold. Predictions are joined back to the processed data by row index, ethnic groups with fewer than 20 people (60 prediction rows, because of the three repeats) are merged into "Other/Unknown", sex is labelled, and the rates are computed for every value of sex and ethnicity for the model chosen for that group.
 
 **8. Answers.** Markdown only: the answers to RQ1 and RQ2 drawn from the tables above, with the numbers that support each point.
+
+---
+
+## 07_explainability.ipynb
+
+Answers RQ3: which questions drive the predictions, and do SHAP, LIME and the EBM's own importances agree? All three explain the same model, an EBM with `interactions=0` (purely additive) trained on 80% of each group and explained on the other 20%.
+
+**Setup.** Imports `shap`, `LimeTabularExplainer` from lime, the EBM, SMOTENC and `train_test_split`. `CATEGORICAL` lists the positions of every feature except age, which LIME and SMOTENC both need. Figure style as before.
+
+**1. Three ways of measuring importance.**
+
+- `ebm_importance(model)` reads `term_importances()` straight from the fitted EBM inside the pipeline: the model's own, exact explanation.
+- `shap_explanation(model, X_train, X_test)` builds a model-agnostic permutation `shap.Explainer` around the pipeline's `predict_proba`, with 50 training rows as background, and returns the SHAP values for every test row. The pipeline is called through a small wrapper so the input keeps its column names.
+- `lime_importance(model, X_train, X_test)` fits a LIME explainer on the training data, explains every test row one at a time with `explain_instance`, and averages the absolute weights over the test set. This is the slow part of the notebook.
+
+**Training loop.** For each group: stratified 80/20 split with a fixed seed, fit the SMOTENC + EBM pipeline on the training part, print test accuracy, compute the SHAP values, and collect a features × methods table with the EBM importance, the mean absolute SHAP value per feature and the LIME average.
+
+**2. Importance per method and age group.** Each column is scaled to sum to 1 so the methods are comparable, saved as `results/tables/feature_importance.csv`, and drawn as a 2×2 grid of heatmaps (features × methods per group), saved as `fig_importance_by_method`.
+
+**3. Do the methods agree?** For every group and every pair of methods (EBM–SHAP, EBM–LIME, SHAP–LIME), two numbers on the ten questions only: Spearman's ρ between the two rankings and the number of questions shared by the two top-5 sets. The four personal details are left out because they are near zero under every method and would make agreement look better than it is. Saved as `results/tables/explanation_agreement.csv`.
+
+**4. Top questions per age group.** A table of the five highest-ranked questions per group and method. The markdown warns that the same item number is a different question in Q-CHAT-10 and the three AQ-10 versions.
+
+**5. SHAP summary plots.** A 2×2 grid of SHAP beeswarm plots (one per group, eight features shown), where each dot is one test person and the colour is the answer value. Saved as `fig_shap_beeswarm`.
+
+**6. Answer to RQ3.** Markdown with the findings: all ten questions carry roughly equal importance, the methods agree on the top questions but not on the full order, the top questions change with age group, personal details hardly matter, and why the rankings describe the sample rather than clinical importance.
+
+---
+
+## 08_harder_settings.ipynb
+
+Makes the task harder in two practical ways so the models can be told apart: a reduced questionnaire and noisy answers. Six models, stratified 5-fold cross-validation repeated twice, fixed hyperparameters (the values notebook 05 chose most often).
+
+**Setup.** Same libraries as notebook 05, TabPFN imported first. `K_VALUES = [4, 6, 8]` are the reduced questionnaire sizes and `NOISE_LEVELS = [0.05, 0.10, 0.20]` the shares of answers flipped. `RERUN` works as in notebook 05.
+
+**Helpers.**
+
+- `get_classifier(name)` returns each model with fixed settings; `make_pipeline(name, features)` wraps it with SMOTENC (and a scaler for Logistic Regression) exactly as in notebook 05.
+- `top_questions(df, k)` ranks the ten questions by their chi-square statistic against the label, computed on the training fold only, and returns the top k.
+- `flip_answers(X, p, rng)` flips each answer in A1–A10 with probability p, leaving the personal details alone.
+- `evaluate(model, X, y)` returns ROC-AUC, recall, accuracy and Brier score at the 0.5 threshold.
+
+**Running both experiments.** One loop over groups and folds. In each fold the noisy test sets are made once (one per noise level, seeded by fold number) and the reduced question sets are chosen once from the training fold. Then for every model: fit on all ten questions plus details, score on the clean test fold (`setting = "questions", value = 10`) and on each noisy copy (`setting = "noise"`); then fit again on each reduced set and score on the clean test fold (`setting = "questions", value = k`, with the chosen questions recorded). Everything goes to `results/tables/harder_settings.csv`, one row per group, fold, model and setting.
+
+**Reduced questionnaire.** Two pivot tables, ROC-AUC and recall, with groups and models as rows and 4, 6, 8, 10 questions as columns. A third table counts which questions the chi-square step chose for k = 6 across the ten folds, to show the choice is stable.
+
+**Noisy answers.** A pivot table of ROC-AUC per group and model with the clean result (noise 0) inserted as the first column, followed by 5%, 10% and 20%.
+
+**Figures.** `lines(frame, xlabel, title, filename)` draws a 2×2 grid, one panel per group, with one line per model. Called twice: ROC-AUC against the number of questions (`fig_reduced_questions`) and against the noise level (`fig_noise`).
+
+**What this shows.** Markdown with the findings for both settings and how they relate to the full-questionnaire result.

@@ -1,4 +1,4 @@
-# Data, EDA, model training and results (notebooks 01-06). Python 3.11.
+# Research environment (notebooks 01-08). Python 3.11.
 numpy==2.2.6
 pandas==2.3.3
 scipy==1.17.1
@@ -16,6 +16,8 @@ lightgbm==4.7.0
 interpret==0.7.8
 tabpfn==2.0.9
 joblib==1.6.0
+shap==0.51.0
+lime==0.2.0.1
 
 jupyterlab==4.6.4
 ipykernel==7.4.0
