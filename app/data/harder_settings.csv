@@ -1,0 +1,169 @@
+setting,value,group,model,roc_auc,recall,accuracy
+noise,0.05,adolescent,EBM,0.973,0.933,0.911
+noise,0.05,adolescent,LightGBM,0.952,0.892,0.872
+noise,0.05,adolescent,Logistic Regression,0.977,0.933,0.916
+noise,0.05,adolescent,Random Forest,0.965,0.933,0.891
+noise,0.05,adolescent,TabPFN,0.976,0.933,0.911
+noise,0.05,adolescent,XGBoost,0.955,0.95,0.906
+noise,0.05,adult,EBM,0.985,0.895,0.956
+noise,0.05,adult,LightGBM,0.98,0.851,0.933
+noise,0.05,adult,Logistic Regression,0.986,0.895,0.956
+noise,0.05,adult,Random Forest,0.98,0.878,0.935
+noise,0.05,adult,TabPFN,0.987,0.895,0.956
+noise,0.05,adult,XGBoost,0.984,0.886,0.946
+noise,0.05,child,EBM,0.968,0.903,0.932
+noise,0.05,child,LightGBM,0.955,0.869,0.888
+noise,0.05,child,Logistic Regression,0.969,0.899,0.93
+noise,0.05,child,Random Forest,0.959,0.888,0.902
+noise,0.05,child,TabPFN,0.966,0.888,0.921
+noise,0.05,child,XGBoost,0.961,0.891,0.895
+noise,0.05,toddler,EBM,0.983,0.975,0.952
+noise,0.05,toddler,LightGBM,0.982,0.962,0.937
+noise,0.05,toddler,Logistic Regression,0.986,0.975,0.952
+noise,0.05,toddler,Random Forest,0.978,0.949,0.917
+noise,0.05,toddler,TabPFN,0.985,0.975,0.952
+noise,0.05,toddler,XGBoost,0.983,0.967,0.943
+noise,0.1,adolescent,EBM,0.902,0.767,0.792
+noise,0.1,adolescent,LightGBM,0.875,0.8,0.792
+noise,0.1,adolescent,Logistic Regression,0.901,0.775,0.802
+noise,0.1,adolescent,Random Forest,0.884,0.817,0.797
+noise,0.1,adolescent,TabPFN,0.891,0.767,0.792
+noise,0.1,adolescent,XGBoost,0.869,0.775,0.777
+noise,0.1,adult,EBM,0.962,0.819,0.925
+noise,0.1,adult,LightGBM,0.962,0.786,0.91
+noise,0.1,adult,Logistic Regression,0.965,0.819,0.925
+noise,0.1,adult,Random Forest,0.962,0.776,0.908
+noise,0.1,adult,TabPFN,0.969,0.819,0.925
+noise,0.1,adult,XGBoost,0.967,0.816,0.92
+noise,0.1,child,EBM,0.94,0.812,0.875
+noise,0.1,child,LightGBM,0.93,0.801,0.843
+noise,0.1,child,Logistic Regression,0.94,0.813,0.871
+noise,0.1,child,Random Forest,0.932,0.805,0.839
+noise,0.1,child,TabPFN,0.939,0.797,0.864
+noise,0.1,child,XGBoost,0.928,0.823,0.845
+noise,0.1,toddler,EBM,0.956,0.955,0.916
+noise,0.1,toddler,LightGBM,0.965,0.946,0.904
+noise,0.1,toddler,Logistic Regression,0.968,0.955,0.916
+noise,0.1,toddler,Random Forest,0.963,0.941,0.899
+noise,0.1,toddler,TabPFN,0.966,0.955,0.916
+noise,0.1,toddler,XGBoost,0.967,0.95,0.913
+noise,0.2,adolescent,EBM,0.87,0.683,0.757
+noise,0.2,adolescent,LightGBM,0.845,0.725,0.752
+noise,0.2,adolescent,Logistic Regression,0.878,0.717,0.777
+noise,0.2,adolescent,Random Forest,0.854,0.742,0.757
+noise,0.2,adolescent,TabPFN,0.881,0.683,0.753
+noise,0.2,adolescent,XGBoost,0.824,0.75,0.752
+noise,0.2,adult,EBM,0.897,0.622,0.854
+noise,0.2,adult,LightGBM,0.887,0.6,0.842
+noise,0.2,adult,Logistic Regression,0.9,0.622,0.854
+noise,0.2,adult,Random Forest,0.895,0.578,0.834
+noise,0.2,adult,TabPFN,0.902,0.619,0.853
+noise,0.2,adult,XGBoost,0.894,0.605,0.844
+noise,0.2,child,EBM,0.849,0.627,0.75
+noise,0.2,child,LightGBM,0.821,0.631,0.738
+noise,0.2,child,Logistic Regression,0.844,0.627,0.752
+noise,0.2,child,Random Forest,0.826,0.624,0.739
+noise,0.2,child,TabPFN,0.837,0.624,0.748
+noise,0.2,child,XGBoost,0.825,0.639,0.743
+noise,0.2,toddler,EBM,0.869,0.941,0.846
+noise,0.2,toddler,LightGBM,0.895,0.931,0.836
+noise,0.2,toddler,Logistic Regression,0.903,0.941,0.846
+noise,0.2,toddler,Random Forest,0.9,0.927,0.833
+noise,0.2,toddler,TabPFN,0.901,0.941,0.846
+noise,0.2,toddler,XGBoost,0.898,0.932,0.841
+questions,4.0,adolescent,EBM,0.867,0.833,0.793
+questions,4.0,adolescent,LightGBM,0.844,0.792,0.782
+questions,4.0,adolescent,Logistic Regression,0.868,0.833,0.788
+questions,4.0,adolescent,Random Forest,0.87,0.85,0.797
+questions,4.0,adolescent,TabPFN,0.867,0.85,0.813
+questions,4.0,adolescent,XGBoost,0.87,0.808,0.783
+questions,4.0,adult,EBM,0.954,0.835,0.896
+questions,4.0,adult,LightGBM,0.938,0.786,0.873
+questions,4.0,adult,Logistic Regression,0.953,0.835,0.899
+questions,4.0,adult,Random Forest,0.955,0.83,0.886
+questions,4.0,adult,TabPFN,0.953,0.835,0.889
+questions,4.0,adult,XGBoost,0.946,0.832,0.885
+questions,4.0,child,EBM,0.886,0.819,0.807
+questions,4.0,child,LightGBM,0.865,0.797,0.784
+questions,4.0,child,Logistic Regression,0.88,0.808,0.802
+questions,4.0,child,Random Forest,0.885,0.816,0.807
+questions,4.0,child,TabPFN,0.884,0.804,0.802
+questions,4.0,child,XGBoost,0.876,0.812,0.798
+questions,4.0,toddler,EBM,0.952,0.896,0.89
+questions,4.0,toddler,LightGBM,0.938,0.88,0.867
+questions,4.0,toddler,Logistic Regression,0.953,0.896,0.891
+questions,4.0,toddler,Random Forest,0.948,0.891,0.883
+questions,4.0,toddler,TabPFN,0.951,0.888,0.883
+questions,4.0,toddler,XGBoost,0.94,0.88,0.87
+questions,6.0,adolescent,EBM,0.92,0.892,0.857
+questions,6.0,adolescent,LightGBM,0.911,0.883,0.842
+questions,6.0,adolescent,Logistic Regression,0.936,0.925,0.866
+questions,6.0,adolescent,Random Forest,0.934,0.892,0.847
+questions,6.0,adolescent,TabPFN,0.934,0.892,0.857
+questions,6.0,adolescent,XGBoost,0.917,0.892,0.851
+questions,6.0,adult,EBM,0.968,0.903,0.921
+questions,6.0,adult,LightGBM,0.959,0.832,0.899
+questions,6.0,adult,Logistic Regression,0.97,0.919,0.922
+questions,6.0,adult,Random Forest,0.969,0.922,0.923
+questions,6.0,adult,TabPFN,0.971,0.908,0.92
+questions,6.0,adult,XGBoost,0.963,0.846,0.905
+questions,6.0,child,EBM,0.945,0.865,0.845
+questions,6.0,child,LightGBM,0.927,0.85,0.829
+questions,6.0,child,Logistic Regression,0.946,0.857,0.838
+questions,6.0,child,Random Forest,0.94,0.888,0.852
+questions,6.0,child,TabPFN,0.945,0.868,0.855
+questions,6.0,child,XGBoost,0.935,0.861,0.841
+questions,6.0,toddler,EBM,0.975,0.914,0.915
+questions,6.0,toddler,LightGBM,0.965,0.925,0.901
+questions,6.0,toddler,Logistic Regression,0.976,0.916,0.914
+questions,6.0,toddler,Random Forest,0.971,0.914,0.906
+questions,6.0,toddler,TabPFN,0.975,0.913,0.91
+questions,6.0,toddler,XGBoost,0.967,0.921,0.906
+questions,8.0,adolescent,EBM,0.938,0.883,0.866
+questions,8.0,adolescent,LightGBM,0.921,0.883,0.851
+questions,8.0,adolescent,Logistic Regression,0.946,0.883,0.861
+questions,8.0,adolescent,Random Forest,0.956,0.908,0.866
+questions,8.0,adolescent,TabPFN,0.954,0.917,0.881
+questions,8.0,adolescent,XGBoost,0.943,0.9,0.876
+questions,8.0,adult,EBM,0.984,0.903,0.94
+questions,8.0,adult,LightGBM,0.98,0.862,0.933
+questions,8.0,adult,Logistic Regression,0.987,0.895,0.942
+questions,8.0,adult,Random Forest,0.983,0.9,0.937
+questions,8.0,adult,TabPFN,0.987,0.903,0.943
+questions,8.0,adult,XGBoost,0.981,0.881,0.938
+questions,8.0,child,EBM,0.98,0.917,0.918
+questions,8.0,child,LightGBM,0.96,0.895,0.875
+questions,8.0,child,Logistic Regression,0.98,0.936,0.927
+questions,8.0,child,Random Forest,0.974,0.914,0.888
+questions,8.0,child,TabPFN,0.979,0.925,0.918
+questions,8.0,child,XGBoost,0.966,0.884,0.879
+questions,8.0,toddler,EBM,0.99,0.967,0.951
+questions,8.0,toddler,LightGBM,0.985,0.957,0.934
+questions,8.0,toddler,Logistic Regression,0.99,0.964,0.948
+questions,8.0,toddler,Random Forest,0.985,0.943,0.933
+questions,8.0,toddler,TabPFN,0.99,0.975,0.953
+questions,8.0,toddler,XGBoost,0.987,0.954,0.937
+questions,10.0,adolescent,EBM,0.985,0.983,0.95
+questions,10.0,adolescent,LightGBM,0.969,0.958,0.901
+questions,10.0,adolescent,Logistic Regression,0.991,0.975,0.951
+questions,10.0,adolescent,Random Forest,0.978,0.958,0.901
+questions,10.0,adolescent,TabPFN,0.989,0.975,0.936
+questions,10.0,adolescent,XGBoost,0.967,0.967,0.916
+questions,10.0,adult,EBM,1.0,1.0,1.0
+questions,10.0,adult,LightGBM,0.995,0.927,0.965
+questions,10.0,adult,Logistic Regression,1.0,1.0,1.0
+questions,10.0,adult,Random Forest,0.995,0.938,0.968
+questions,10.0,adult,TabPFN,1.0,1.0,1.0
+questions,10.0,adult,XGBoost,0.998,0.981,0.983
+questions,10.0,child,EBM,1.0,1.0,1.0
+questions,10.0,child,LightGBM,0.99,0.951,0.943
+questions,10.0,child,Logistic Regression,1.0,1.0,1.0
+questions,10.0,child,Random Forest,0.988,0.959,0.948
+questions,10.0,child,TabPFN,1.0,0.989,0.988
+questions,10.0,child,XGBoost,0.99,0.974,0.948
+questions,10.0,toddler,EBM,1.0,1.0,1.0
+questions,10.0,toddler,LightGBM,0.998,0.983,0.978
+questions,10.0,toddler,Logistic Regression,1.0,1.0,1.0
+questions,10.0,toddler,Random Forest,0.992,0.954,0.947
+questions,10.0,toddler,TabPFN,1.0,1.0,1.0
+questions,10.0,toddler,XGBoost,0.999,0.986,0.985
