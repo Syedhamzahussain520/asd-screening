@@ -2,11 +2,11 @@
 
 Code for the MSc project *"Early Autism Screening Using Interpretable Machine Learning Models and a Web Based Decision Support Tool"*.
 
-The project compares interpretable machine learning models for autism (ASD) screening in four age groups (toddler, child, adolescent, adult) using public questionnaire datasets, and will deliver the chosen models through a web based screening tool.
+The project compares interpretable machine learning models for autism (ASD) screening in four age groups (toddler, child, adolescent, adult) using public questionnaire datasets, and delivers the chosen models through a web based screening tool.
 
 See [ABOUT.md](ABOUT.md) for the background (the problem, previous work, the research gap and how each part of the study is handled) and [NOTEBOOKS.md](NOTEBOOKS.md) for a section-by-section walk-through of the code in each notebook.
 
-This repository is being built up stage by stage. It contains the full research pipeline (data download, understanding and preprocessing, exploratory analysis, model training, results, explainability and the harder-setting experiments) and the Streamlit web app that serves the chosen models.
+The repository contains the full research pipeline (data download, understanding and preprocessing, exploratory analysis, model training, results, explainability and the harder-setting experiments) and the Streamlit web app that serves the chosen models.
 
 ## Project layout
 
@@ -43,30 +43,91 @@ asd-screening/
 
 ## Setup on Windows
 
-1. Install **Python 3.11** from https://www.python.org/downloads/ and tick *Add python.exe to PATH* during installation.
+Everything below was written for Windows 10 or 11. Each command is typed into *Command Prompt* unless it says PowerShell.
 
-2. Open *Command Prompt* (or PowerShell) in the project folder and create a virtual environment:
+### 1. Install the tools
+
+- **Python 3.11** from https://www.python.org/downloads/ (choose a 3.11.x release, 64-bit). On the first screen of the installer tick **Add python.exe to PATH**. Other versions of Python can stay installed; the `py -3.11` command below picks the right one.
+- **Git for Windows** from https://git-scm.com/download/win, with the default options. This is only needed to clone the repository; downloading it as a zip works too (see step 2).
+- A web browser for Jupyter and the app.
+
+Check the installation by opening a new Command Prompt and typing:
+
+```bat
+py -3.11 --version
+git --version
+```
+
+### 2. Get the code
+
+The repository is private, so you need to be signed in to GitHub with an account that has access. Then either
+
+```bat
+cd %USERPROFILE%\Documents
+git clone https://github.com/Syedhamzahussain520/asd-screening.git
+cd asd-screening
+```
+
+(Git asks you to sign in to GitHub in a browser window the first time), or on the repository page click **Code → Download ZIP**, unzip it, and open Command Prompt inside the unzipped `asd-screening` folder. A quick way to open a Command Prompt in a folder is to type `cmd` in the address bar of File Explorer while that folder is open.
+
+Keep the folder path short and without special characters (for example `C:\Users\<you>\Documents\asd-screening`); very long paths can make `pip` fail on Windows.
+
+### 3. Create the Python environment
+
+Inside the project folder:
+
+```bat
+py -3.11 -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+The prompt starts with `(.venv)` when the environment is active. Installation downloads a few hundred megabytes (PyTorch, needed by TabPFN, is the largest part), so it takes a while on a slow connection.
+
+**Every time you open a new Command Prompt** you have to activate the environment again with `.venv\Scripts\activate` before running Jupyter or the app. `deactivate` leaves it.
+
+If you use **PowerShell** instead of Command Prompt, activate with `.venv\Scripts\Activate.ps1`. If PowerShell refuses to run the script, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, answer `Y`, and try again.
+
+### 4. Kaggle token (only needed for notebook 01)
+
+Three datasets are hosted on Kaggle, which needs an API token. The UCI datasets download without an account.
+
+1. Log in to https://www.kaggle.com, open *Settings* → *API* and click **Create New Token**. This downloads a file called `kaggle.json`.
+2. Create the folder `.kaggle` in your user folder. File Explorer does not accept folder names that start with a dot, so create it from Command Prompt:
 
    ```bat
-   py -3.11 -m venv .venv
-   .venv\Scripts\activate
-   python -m pip install --upgrade pip
-   pip install -r requirements.txt
+   mkdir %USERPROFILE%\.kaggle
+   move %USERPROFILE%\Downloads\kaggle.json %USERPROFILE%\.kaggle\
    ```
 
-   In PowerShell use `.venv\Scripts\Activate.ps1` instead of `activate`. If PowerShell refuses to run the script, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once and try again.
+   The file must end up at `C:\Users\<your user name>\.kaggle\kaggle.json`.
 
-3. **Kaggle token.** Three of the datasets are hosted on Kaggle, which needs an API token:
-   - Log in to Kaggle, open *Settings* → *API* and click **Create New Token**. This downloads `kaggle.json`.
-   - Create the folder `C:\Users\<your user name>\.kaggle` and move `kaggle.json` into it.
+Keep this file private; it is listed in `.gitignore` so it cannot be committed by accident.
 
-   The UCI datasets download without an account.
+### 5. Start Jupyter
 
-4. Start Jupyter and run the notebooks in order:
+With the environment active, from the project folder:
 
-   ```bat
-   jupyter lab
-   ```
+```bat
+jupyter lab
+```
+
+A browser tab opens with JupyterLab. In the file browser on the left open the `notebooks` folder and double-click a notebook. The kernel should show as **Python 3 (ipykernel)**; because Jupyter was started from the environment, that is the project environment. To run a whole notebook use the menu *Run → Run All Cells*. The notebooks use paths relative to the `notebooks` folder, so Jupyter must be started from the project folder as shown, not from somewhere else.
+
+Close Jupyter with `Ctrl+C` in the Command Prompt window (twice if it asks for confirmation).
+
+### 6. Common problems
+
+| Message | Cause and fix |
+|---|---|
+| `'py' is not recognized` or `'pip' is not recognized` | Python was installed without *Add to PATH*. Re-run the installer, choose *Modify* and tick the PATH option, then open a new Command Prompt. |
+| `'jupyter' is not recognized` or `'streamlit' is not recognized` | The environment is not active. Run `.venv\Scripts\activate` first. |
+| `OSError: Could not find kaggle.json` | The token is not at `C:\Users\<you>\.kaggle\kaggle.json`. Check the folder name and that the file was not renamed to `kaggle.json.json`. |
+| `401 Unauthorized` from Kaggle | The token has expired or the dataset's terms were not accepted on the Kaggle website. Create a new token, and open each Kaggle dataset page once while logged in. |
+| `DLL load failed` when importing LightGBM or XGBoost | Install the *Microsoft Visual C++ Redistributable* (x64) from https://aka.ms/vs/17/release/vc_redist.x64.exe and restart. |
+| `pip` fails with a *path too long* error | Move the project to a shorter path, or enable long paths in Windows (*Edit group policy* → *Computer Configuration* → *Administrative Templates* → *System* → *Filesystem* → *Enable Win32 long paths*). |
+| The kernel dies while running notebook 05 or 08 | Make sure the TabPFN import is still the first import in the notebook, and that no other notebook kernel is running at the same time. Restart the kernel and run again. |
 
 ## Running the notebooks
 
@@ -95,7 +156,7 @@ Run it locally from the project folder, with the virtual environment active:
 streamlit run app/Home.py
 ```
 
-The browser opens at `http://localhost:8501`. The research environment above already contains everything the app needs. To run the app on its own, for example on another machine, install `app/requirements.txt` instead; it leaves out TabPFN and PyTorch, which the deployed models do not need.
+The first time Streamlit runs it asks for an email address in the terminal; just press Enter. The browser then opens at `http://localhost:8501`; if it does not, open that address yourself. Stop the app with `Ctrl+C` in the Command Prompt window. The research environment above already contains everything the app needs. To run the app on its own, for example on another machine, install `app/requirements.txt` instead; it leaves out TabPFN and PyTorch, which the deployed models do not need.
 
 To deploy on [Streamlit Community Cloud](https://share.streamlit.io): sign in with GitHub, choose **New app**, pick this repository and branch `main`, set the main file to `app/Home.py`, and under *Advanced settings* choose **Python 3.11**. Streamlit Cloud installs `app/requirements.txt` because it sits next to the main file. Package versions are pinned to the training environment because the saved models must be loaded with the same scikit-learn version.
 
