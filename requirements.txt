@@ -1,10 +1,16 @@
 # Packages needed to run the Streamlit app (this is the file Streamlit Community Cloud installs).
-# Versions match the training environment so the saved models load correctly.
 # For the notebooks install requirements-research.txt instead.
+#
+# The models were trained with scikit-learn 1.6.1 / numpy 2.2.6, so those versions are used
+# wherever they have pre-built wheels (Python 3.9-3.13). On Python 3.14 there are no wheels
+# for them, so newer versions are installed instead; the saved models load and give the same
+# predictions, scikit-learn only prints a version warning.
 streamlit==1.65.0
 pandas==2.3.3
-numpy==2.2.6
-scikit-learn==1.6.1
+numpy==2.2.6; python_version < "3.14"
+numpy>=2.3; python_version >= "3.14"
+scikit-learn==1.6.1; python_version < "3.14"
+scikit-learn>=1.8; python_version >= "3.14"
 imbalanced-learn==0.14.2
 interpret-core==0.7.8
 shap==0.51.0

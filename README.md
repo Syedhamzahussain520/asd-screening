@@ -159,7 +159,7 @@ streamlit run app/Home.py
 
 The first time Streamlit runs it asks for an email address in the terminal; just press Enter. The browser then opens at `http://localhost:8501`; if it does not, open that address yourself. Stop the app with `Ctrl+C` in the Command Prompt window. The research environment above already contains everything the app needs. To run the app on its own, for example on another machine, install `app/requirements.txt` instead; it leaves out TabPFN and PyTorch, which the deployed models do not need.
 
-To deploy on [Streamlit Community Cloud](https://share.streamlit.io): sign in with GitHub, choose **New app**, pick this repository and branch `main`, set the main file to `app/Home.py`, and under *Advanced settings* choose **Python 3.11**. Streamlit Cloud installs `requirements.txt` from the repository root, which holds only what the app needs. Package versions are pinned to the training environment because the saved models must be loaded with the same scikit-learn version.
+To deploy on [Streamlit Community Cloud](https://share.streamlit.io): sign in with GitHub, choose **New app**, pick this repository and branch `main`, set the main file to `app/Home.py`, and under *Advanced settings* choose **Python 3.11**. Streamlit Cloud installs `requirements.txt` from the repository root, which holds only what the app needs. Package versions are pinned to the training environment so the saved models load with the same scikit-learn version. If the app is created on Python 3.14, where those versions have no pre-built packages, the file falls back to newer numpy and scikit-learn releases; the models load and give the same predictions, with a version warning in the log.
 
 ## Note on the data
 
