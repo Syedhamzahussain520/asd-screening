@@ -33,9 +33,10 @@ asd-screening/
 │   ├── pages/                            1_Screening.py, 2_Model_Performance.py, 3_About.py
 │   ├── questions.py                      questionnaire wording and scoring
 │   ├── models/                           trained models used by the app (written by notebook 05)
-│   ├── data/                             summary tables shown in the app (written by notebooks 05 and 08)
-│   └── requirements.txt                  app-only dependencies
-├── requirements.txt
+│   └── data/                             summary tables shown in the app (written by notebooks 05 and 08)
+├── .streamlit/config.toml                Streamlit settings
+├── requirements.txt                      web app dependencies (what Streamlit Cloud installs)
+├── requirements-research.txt             full environment for the notebooks
 ├── README.md
 ├── ABOUT.md                              background, previous work and approach
 └── NOTEBOOKS.md                          what each notebook does, section by section
@@ -158,7 +159,7 @@ streamlit run app/Home.py
 
 The first time Streamlit runs it asks for an email address in the terminal; just press Enter. The browser then opens at `http://localhost:8501`; if it does not, open that address yourself. Stop the app with `Ctrl+C` in the Command Prompt window. The research environment above already contains everything the app needs. To run the app on its own, for example on another machine, install `app/requirements.txt` instead; it leaves out TabPFN and PyTorch, which the deployed models do not need.
 
-To deploy on [Streamlit Community Cloud](https://share.streamlit.io): sign in with GitHub, choose **New app**, pick this repository and branch `main`, set the main file to `app/Home.py`, and under *Advanced settings* choose **Python 3.11**. Streamlit Cloud installs `app/requirements.txt` because it sits next to the main file. Package versions are pinned to the training environment because the saved models must be loaded with the same scikit-learn version.
+To deploy on [Streamlit Community Cloud](https://share.streamlit.io): sign in with GitHub, choose **New app**, pick this repository and branch `main`, set the main file to `app/Home.py`, and under *Advanced settings* choose **Python 3.11**. Streamlit Cloud installs `requirements.txt` from the repository root, which holds only what the app needs. Package versions are pinned to the training environment because the saved models must be loaded with the same scikit-learn version.
 
 ## Note on the data
 

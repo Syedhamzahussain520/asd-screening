@@ -1,23 +1,12 @@
-# Research environment (notebooks 01-08). Python 3.11.
-numpy==2.2.6
+# Packages needed to run the Streamlit app (this is the file Streamlit Community Cloud installs).
+# Versions match the training environment so the saved models load correctly.
+# For the notebooks install requirements-research.txt instead.
+streamlit==1.65.0
 pandas==2.3.3
-scipy==1.17.1
-requests==2.34.2
-kaggle==2.2.4
-
-matplotlib==3.11.2
-seaborn==0.13.2
-scikit-posthocs==0.17.1
-
+numpy==2.2.6
 scikit-learn==1.6.1
 imbalanced-learn==0.14.2
-xgboost==3.2.0
-lightgbm==4.7.0
-interpret==0.7.8
-tabpfn==2.0.9
-joblib==1.6.0
+interpret-core==0.7.8
 shap==0.51.0
-lime==0.2.0.1
-
-jupyterlab==4.6.4
-ipykernel==7.4.0
+matplotlib==3.11.2
+joblib==1.6.0
