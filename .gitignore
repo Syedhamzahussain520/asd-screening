@@ -7,3 +7,7 @@ kaggle.json
 
 # downloaded by notebook 01
 data/raw/
+
+# local environment files, not part of the repository
+pyproject.toml
+uv.lock
