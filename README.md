@@ -81,7 +81,7 @@ Inside the project folder:
 py -3.11 -m venv .venv
 .venv\Scripts\activate
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements-research.txt
 ```
 
 The prompt starts with `(.venv)` when the environment is active. Installation downloads a few hundred megabytes (PyTorch, needed by TabPFN, is the largest part), so it takes a while on a slow connection.
