@@ -154,14 +154,18 @@ Turns the per-fold scores saved by notebook 05 into the tables, figures and stat
 
 **Setup.** Loads `cv_folds.csv` and `cross_source.csv`. `METRICS` lists the six scores reported. The figure style is the same as notebook 04. `SHORT` maps the model names to the abbreviations used in figures.
 
+**Records per dataset.** A small table with the number of records, positive cases and negative cases in each of the six cleaned datasets, saved as `results/tables/dataset_sizes.csv`.
+
 **1. Main results.** Groups the folds by age group and model, takes mean and standard deviation of every metric, formats them as "mean ± sd", orders the rows as `GROUPS × MODEL_NAMES` and saves `results/tables/main_results.csv`.
+
+**1b. PR-AUC and calibration.** Uses the out-of-fold predictions from notebook 05, joined to the true labels by row number. PR-AUC (`average_precision_score`) is computed for each of the three repeats and averaged, and shown next to the chance level, which is the share of positive cases. `ece(y, prob)` computes the expected calibration error: predictions are put into ten boxes by probability and the average gap between predicted probability and the real share of positives is taken. Both go to `results/tables/pr_auc_calibration.csv`. A 2×2 calibration plot (one line per model) is saved as `fig_calibration`.
 
 **2. Baseline: the scoring rule itself.** For each group, adds up A1–A10, applies the cut-off and compares the result with the label. No learning is involved. The markdown below explains why the rule is right every time and what that means for reading the model scores.
 
 **2b. Sanity checks.** Two controls that show the perfect scores come from the data, not from a leak in the pipeline:
 
 - *Shuffled labels.* A plain scaled Logistic Regression is cross-validated on the real labels and again on randomly permuted labels. If anything leaked between folds the shuffled score would stay high; it should fall to about 0.5.
-- *Raw-file hold-out.* The four raw downloaded files are read again with the same `read_arff()` as notebook 02, with no cleaning at all. A random 20% hold-out is split off before anything else happens, and a Logistic Regression on the ten answers only is fitted on the rest and scored on the hold-out.
+- *Raw-file hold-out.* The four raw downloaded files are read again with the same `read_arff()` as notebook 02, with no cleaning at all. A random 20% hold-out is split off before anything else happens, and a Logistic Regression on the ten answers only is fitted on the rest and scored on the hold-out. The total-score column is not used, because the label is made from it. The check shows that the perfect scores do not depend on the project's own cleaning or pipeline code.
 
 The three AUCs per group go to `results/tables/sanity_checks.csv`.
 
@@ -169,15 +173,15 @@ The three AUCs per group go to `results/tables/sanity_checks.csv`.
 
 **4. Are the differences real?** Three tests:
 
-- *Friedman test* per group and metric (ROC-AUC and F1): the fold scores are pivoted to a folds × models table and `friedmanchisquare()` tests whether the six models differ overall, with folds as blocks.
+- *Friedman test* per group and metric (ROC-AUC and F1): the fold scores are pivoted to a folds × models table and `friedmanchisquare()` tests whether the six models differ overall, with folds as blocks. Kendall's W is added as the effect size.
 - *Nemenyi post-hoc test*: `posthoc_nemenyi_friedman()` on the same table gives a p-value for every pair of models. Drawn as a 2×2 grid of heatmaps, saved as `fig_nemenyi_roc_auc`.
-- *Corrected resampled t-test*: `corrected_ttest(a, b)` implements the Nadeau–Bengio correction, inflating the variance of the fold differences by `1/n + test_frac/(1 − test_frac)` because folds from repeated cross-validation share training data. It is run for EBM and TabPFN against every other model on ROC-AUC, and the table flags pairs with p < 0.05. The markdown explains why the plain Friedman p-values are a little too small.
+- *Corrected resampled t-test*: `corrected_ttest(a, b)` implements the Nadeau–Bengio correction, inflating the variance of the fold differences by `1/n + test_frac/(1 − test_frac)` because folds from repeated cross-validation share training data. It is run for EBM and TabPFN against every other model on ROC-AUC. `holm(p)` then adjusts the nine p-values of each age group for multiple comparisons, an effect size (Cohen's d of the fold differences) is added, and the table flags pairs with adjusted p < 0.05. Saved as `results/tables/corrected_ttests.csv`. The markdown explains that Friedman and Nemenyi assume independent blocks, which folds of one dataset are not, so those two are read as a description only.
 
 **5. Missed cases.** Sums the confusion-matrix counts over the 15 folds per group and model and computes the share of positive cases missed (false negatives). Each record appears three times because of the three repeats.
 
 **6. Cross-source results (RQ2).** Adds an "in-source AUC" column to the cross-source table (the cross-validated ROC-AUC of the same model on its training source) so the drop can be read directly. Then a grouped bar chart of ROC-AUC per train→test pair and model, saved as `fig_cross_source`.
 
-**7. Bias check.** Loads the out-of-fold predictions and the chosen model per group. `rates(df)` returns the number of people, recall and false-positive rate at the 0.5 threshold. Predictions are joined back to the processed data by row index, ethnic groups with fewer than 20 people (60 prediction rows, because of the three repeats) are merged into "Other/Unknown", sex is labelled, and the rates are computed for every value of sex and ethnicity for the model chosen for that group.
+**7. Bias check.** Loads the out-of-fold predictions and the chosen model per group. `rates(df)` returns the number of people, the number of positive and negative cases, recall and false-positive rate at the 0.5 threshold. Predictions are joined back to the processed data by row index, ethnic groups with fewer than 20 people (60 prediction rows, because of the three repeats) are merged into "Other/Unknown", sex is labelled, and the rates are computed for every value of sex and ethnicity for the model chosen for that group. Sex and ethnicity are two separate groupings of the same people. The table is saved as `results/tables/bias_check.csv`.
 
 **8. Answers.** Markdown only: the answers to RQ1 and RQ2 drawn from the tables above, with the numbers that support each point.
 
@@ -185,27 +189,30 @@ The three AUCs per group go to `results/tables/sanity_checks.csv`.
 
 ## 07_explainability.ipynb
 
-Answers RQ3: which questions drive the predictions, and do SHAP, LIME and the EBM's own importances agree? All three explain the same model, an EBM with `interactions=0` (purely additive) trained on 80% of each group and explained on the other 20%.
+Answers RQ3: which questions drive the predictions, and do SHAP, LIME and the EBM's own importances agree? All three explain the same model, an EBM with `interactions=0` (purely additive). The three methods are measured on the same test rows and on the same scale (log-odds), and everything is repeated over 10 train/test splits.
 
-**Setup.** Imports `shap`, `LimeTabularExplainer` from lime, the EBM, SMOTENC and `train_test_split`. `CATEGORICAL` lists the positions of every feature except age, which LIME and SMOTENC both need. Figure style as before.
+**Setup.** Imports `shap`, `LimeTabularExplainer` from lime, the EBM, SMOTENC and `RepeatedStratifiedKFold`. `CATEGORICAL` lists the positions of every feature except age, which LIME and SMOTENC both need. `PAIRS` lists the three pairs of methods that are compared. Figure style as before.
 
 **1. Three ways of measuring importance.**
 
-- `ebm_importance(model)` reads `term_importances()` straight from the fitted EBM inside the pipeline: the model's own, exact explanation.
-- `shap_explanation(model, X_train, X_test)` builds a model-agnostic permutation `shap.Explainer` around the pipeline's `predict_proba`, with 50 training rows as background, and returns the SHAP values for every test row. The pipeline is called through a small wrapper so the input keeps its column names.
-- `lime_importance(model, X_train, X_test)` fits a LIME explainer on the training data, explains every test row one at a time with `explain_instance`, and averages the absolute weights over the test set. This is the slow part of the notebook.
+- `log_odds(ebm)` returns a small function that gives the EBM's score before it is turned into a probability. All three methods explain this same number.
+- `ebm_scores(ebm, X_test)` calls `eval_terms`, which gives the EBM's own score for every input and every test row: the model's own, exact explanation.
+- `shap_values(ebm, background, X_test)` builds a permutation `shap.Explainer` around the log-odds function, with up to 100 training rows as background, and returns the SHAP values for every test row.
+- `lime_weights(ebm, X_train, X_test)` fits a LIME explainer in regression mode on the training data and explains every test row one at a time, returning one weight per input and row.
 
-**Training loop.** For each group: stratified 80/20 split with a fixed seed, fit the SMOTENC + EBM pipeline on the training part, print test accuracy, compute the SHAP values, and collect a features × methods table with the EBM importance, the mean absolute SHAP value per feature and the LIME average.
+**Main loop.** For each group, 5 folds repeated 2 times give 10 splits. In each split the SMOTENC + EBM pipeline is fitted on the training part, the three methods are run on the same test rows, and the mean absolute effect per input is stored for each method. The loop also runs a check: the EBM scores are moved to the same starting point as SHAP (the background average) and the largest difference from the SHAP values is recorded.
 
-**2. Importance per method and age group.** Each column is scaled to sum to 1 so the methods are comparable, saved as `results/tables/feature_importance.csv`, and drawn as a 2×2 grid of heatmaps (features × methods per group), saved as `fig_importance_by_method`.
+**2. Is SHAP independent of the EBM?** A table of that largest difference per group. It is zero apart from rounding error, so for this additive model SHAP gives back the EBM's own numbers. Their agreement is a consistency check, not separate evidence.
 
-**3. Do the methods agree?** For every group and every pair of methods (EBM–SHAP, EBM–LIME, SHAP–LIME), two numbers on the ten questions only: Spearman's ρ between the two rankings and the number of questions shared by the two top-5 sets. The four personal details are left out because they are near zero under every method and would make agreement look better than it is. Saved as `results/tables/explanation_agreement.csv`.
+**3. Importance per method and age group.** Each method is scaled to sum to 1 in every split and averaged over the splits, saved as `results/tables/feature_importance.csv`, and drawn as a 2×2 grid of heatmaps, saved as `fig_importance_by_method`.
 
-**4. Top questions per age group.** A table of the five highest-ranked questions per group and method. The markdown warns that the same item number is a different question in Q-CHAT-10 and the three AQ-10 versions.
+**4. Do the methods agree?** For every group, split and pair of methods, two numbers on the ten questions only: Spearman's ρ between the two rankings and the number of questions shared by the two top-5 sets. The table reports the mean and standard deviation over the 10 splits, saved as `results/tables/explanation_agreement.csv`. A short cell estimates the chance level: two random rankings share 2.5 of their top five on average.
 
-**5. SHAP summary plots.** A 2×2 grid of SHAP beeswarm plots (one per group, eight features shown), where each dot is one test person and the colour is the answer value. Saved as `fig_shap_beeswarm`.
+**5. Top questions per age group.** A table of the five highest-ranked questions per group and method, from the averaged importances. The markdown warns that the same item number is a different question in Q-CHAT-10 and the three AQ-10 versions.
 
-**6. Answer to RQ3.** Markdown with the findings: all ten questions carry roughly equal importance, the methods agree on the top questions but not on the full order, the top questions change with age group, personal details hardly matter, and why the rankings describe the sample rather than clinical importance.
+**6. SHAP summary plots.** A 2×2 grid of SHAP beeswarm plots from the first split (one per group, eight features shown), where each dot is one test person and the colour is the answer value. Saved as `fig_shap_beeswarm`.
+
+**7. Answer to RQ3.** Markdown with the findings: all ten questions carry roughly equal importance; EBM and SHAP are the same numbers and only differ in their starting point; LIME agrees with them for adolescents but is at chance level for children and adults; the rankings change from split to split; personal details hardly matter; and why the rankings describe the sample rather than clinical importance.
 
 ---
 

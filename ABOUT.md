@@ -63,7 +63,7 @@ Deep neural networks are not included. On small tables of yes/no answers they ha
 
 **Generalisation to other data.** Two further datasets from different sources (Saudi toddlers, a Kaggle adult dataset) are used only as test sets: train on one source, test on the other, and the reverse.
 
-**Explainability.** Every prediction is explained three ways: SHAP, LIME and the EBM's own term contributions. Question rankings from the three methods are compared with Spearman correlation and top-5 overlap, so the project can say whether the explanations agree rather than trusting one tool.
+**Explainability.** Every prediction is explained three ways: SHAP, LIME and the EBM's own term contributions. Question rankings from the three methods are compared with Spearman correlation and top-5 overlap over repeated splits, and against the level expected by chance, so the project can say whether the explanations agree rather than trusting one tool.
 
 **Fairness.** Model performance is broken down by sex and ethnicity to check whether any group is screened worse.
 
@@ -127,17 +127,18 @@ All figures are made at the width of a two-column paper (3.5 in for one column) 
 ### Step 6. Results (notebook 06)
 
 - **Result tables.** Mean and standard deviation of accuracy, precision, recall, F1, ROC-AUC and Brier score over the 15 folds for every model and group.
+- **PR-AUC and calibration.** From the saved out-of-fold predictions, PR-AUC is reported next to its chance level (the share of positive cases), because the groups are unbalanced in different directions. Calibration is checked with a reliability plot and the expected calibration error, to see whether the predicted probabilities can be trusted.
 - **Baseline.** The scoring rule itself (add up the answers, apply the cut-off) is evaluated with no learning. It is right every time because it is the label, which sets the frame for reading the model scores: they measure how well a model recovers a known rule from a few hundred examples.
-- **Sanity checks.** Two controls confirm that the perfect scores come from the data and not from a leak. Shuffling the labels drops a Logistic Regression to chance level, and a hold-out split made on the raw downloaded files before any cleaning gives the same result as the cleaned pipeline.
-- **Statistical tests.** The Friedman test asks whether the six models differ at all within a group, the Nemenyi test which pairs differ, and the corrected resampled t-test compares EBM and TabPFN with every other model while allowing for the overlap between repeated folds.
+- **Sanity checks.** Two controls confirm that the perfect scores come from the data and not from a leak. Shuffling the labels drops a Logistic Regression to chance level, and a hold-out split made on the raw downloaded files before any cleaning, using the ten answers only and not the total-score column, gives the same result as the cleaned pipeline.
+- **Statistical tests.** The Friedman test asks whether the six models differ at all within a group, the Nemenyi test which pairs differ, and the corrected resampled t-test compares EBM and TabPFN with every other model while allowing for the overlap between repeated folds. Friedman and Nemenyi assume independent blocks, which folds of one dataset are not, so they are read as a description only. The conclusions rest on the corrected t-test, with the Holm correction for multiple comparisons and an effect size for each pair.
 - **Missed cases.** False negatives are counted per model and group, because a missed case is the costliest error in screening.
 - **Cross-source results.** The cross-source scores are set beside the in-source cross-validated score of the same model, so the drop when the source changes can be read directly.
 - **Bias check.** Recall and false-positive rate of the chosen model per group are compared between sexes and across ethnic groups, using the out-of-fold predictions so no record is scored by a model that saw it in training.
 
 ### Step 7. Explainability (notebook 07)
 
-- **One model, three explanations.** A purely additive EBM is trained on 80% of each age group and its predictions on the other 20% are explained three ways: the EBM's own term importances (exact, read from the model), SHAP values (permutation form, model-agnostic) and LIME weights averaged over the test set.
-- **Comparing the methods.** Each method's importances are scaled to sum to one and compared per group. Agreement is measured on the ten questions only, with Spearman rank correlation and the overlap of the two top-5 sets. The personal details are excluded from the agreement measure because every method ranks them near zero.
+- **One model, three explanations.** A purely additive EBM is trained and its predictions on held-out rows are explained three ways: the EBM's own term scores (exact, read from the model), SHAP values (permutation form, model-agnostic) and LIME weights. All three use the same test rows and the same scale (log-odds), and the whole comparison is repeated over 10 train/test splits.
+- **Comparing the methods.** Each method's importances are scaled to sum to one and compared per group. Agreement is measured on the ten questions only, with Spearman rank correlation and the overlap of the two top-5 sets, reported as the mean and spread over the splits and compared with the 2.5 shared questions that two random rankings would give. For an additive EBM, SHAP reproduces the model's own scores, so EBM–SHAP agreement is treated as a consistency check and only LIME as an independent view. The personal details are excluded from the agreement measure because every method ranks them near zero.
 - **Reading the result.** Because the true rule weights all ten answers equally, the rankings describe where in this sample the answers vary near the cut-off, not which question is clinically most important. They are presented as support for explaining an individual prediction, not as a finding about autism.
 
 ### Step 8. Harder settings (notebook 08)
@@ -217,9 +218,14 @@ Terms and abbreviations used above, each with a short meaning and an example fro
 | F1 | Harmonic mean of precision and recall; one number that balances the two. | Reported alongside recall. |
 | ROC-AUC | Area under the Receiver Operating Characteristic curve: the probability that a random positive gets a higher risk score than a random negative. 0.5 = guessing, 1.0 = perfect ranking. | The main measure for comparing models. |
 | Brier score | Mean squared difference between the predicted probability and the true label (0 or 1). Lower is better; measures how well calibrated the probabilities are. | A model saying 0.9 for a positive case scores (1−0.9)² = 0.01 on that row. |
+| PR-AUC | Area under the precision-recall curve. It looks only at the positive class, so it is more honest than ROC-AUC when one class is much smaller. A model that guesses scores the share of positive cases. | For adults, guessing gives about 0.27, so a PR-AUC near 1.0 is a real result. |
+| Calibration | Whether the predicted percentages match what really happens. | Of all people given about 80%, about 80% should be positive. |
+| ECE (expected calibration error) | The average gap between the predicted percentage and the real share of positive cases. 0 is perfect. | A model that says 80% where 70% are positive has a gap of 0.10 for those people. |
 | Friedman test | A statistical test of whether several models differ in performance across many folds or datasets. | Tells whether the six models differ at all. |
 | Nemenyi test | A follow-up to the Friedman test that says *which* pairs of models differ. | Tells whether, say, EBM and LightGBM differ. |
 | Corrected resampled t-test | A t-test for comparing two models over repeated CV folds, corrected for the fact that folds overlap and are not independent. | Used for pairwise comparisons such as EBM vs Logistic Regression. |
+| Holm correction | A way to adjust p-values when many tests are run together, so that a result is not called significant only by luck. | Three p-values 0.01, 0.04 and 0.30 become 0.03, 0.08 and 0.30. |
+| Effect size (Cohen's d, Kendall's W) | A number for how big a difference is, not only whether it exists. Cohen's d: about 0.2 small, 0.5 medium, 0.8 large. Kendall's W: 0 to 1, how consistently the models are ranked across folds. | W = 0.93 for toddlers means almost the same ranking in every fold. |
 | Fairness check | Measuring performance separately for subgroups to see whether any group is served worse. | Recall for males vs females, and per ethnicity. |
 | Sanity check | A deliberately simple experiment whose outcome is known, run to confirm the pipeline is not broken. | Shuffling the labels should drop ROC-AUC to about 0.5; if it does not, something is leaking. |
 
