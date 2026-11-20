@@ -1,13 +1,18 @@
-# Questionnaire wording and scoring.
-# Q-CHAT-10: Allison et al. (2012), as given in the toddler dataset descriptions.
-# AQ-10 child / adolescent / adult: Allison, Auyeung & Baron-Cohen (2012).
-# Each answer is turned into 0/1 exactly as in the ASDTests datasets.
+# The questions and how each answer is scored.
+# Q-CHAT-10 = Quantitative Checklist for Autism in Toddlers (10 questions).
+# AQ-10 = Autism Spectrum Quotient, short form with 10 questions (child, adolescent, adult).
+# Both are from Allison, Auyeung & Baron-Cohen (2012).
+# Each answer becomes 0 or 1, in the same way as in the ASDTests datasets.
 
+# the four answers of every AQ-10 question
 AQ_OPTIONS = ["Definitely agree", "Slightly agree", "Slightly disagree", "Definitely disagree"]
 
+# answer lists used by the toddler questions
 FREQUENCY = ["Many times a day", "A few times a day", "A few times a week", "Less than once a week", "Never"]
 ALWAYS_NEVER = ["Always", "Usually", "Sometimes", "Rarely", "Never"]
 
+# cutoff: a score higher than this means "ASD traits".
+# agree_items: the questions where "agree" gives 1 point. For the other questions "disagree" gives 1 point.
 GROUPS = {
     "toddler": {
         "label": "Toddler (12–36 months)",
@@ -95,7 +100,7 @@ GROUPS = {
 
 
 def question_list(group):
-    """Return [(text, options)] for a group."""
+    # gives back a list of (question text, possible answers)
     info = GROUPS[group]
     if group == "toddler":
         return info["questions"]
@@ -103,12 +108,14 @@ def question_list(group):
 
 
 def score_answer(group, item, answer):
-    """item is 1-based. Returns 1 if the answer points towards autistic traits."""
+    # item is the question number (1 to 10). Gives 1 if the answer points towards autistic traits.
+    # Example: adult question 1 is an "agree" question, so "Slightly agree" gives 1
     if group == "toddler":
         options = GROUPS["toddler"]["questions"][item - 1][1]
         pos = options.index(answer)
-        # A1-A9: the last three options score 1; A10: the first three score 1
+        # questions 1 to 9: the last three answers give 1 point. Question 10: the first three do
         return int(pos <= 2) if item == 10 else int(pos >= 2)
 
+    # "Definitely agree" and "Slightly agree" both count as agree
     agree = answer in AQ_OPTIONS[:2]
     return int(agree) if item in GROUPS[group]["agree_items"] else int(not agree)

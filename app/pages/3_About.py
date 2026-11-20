@@ -2,13 +2,17 @@ import streamlit as st
 
 st.set_page_config(page_title="About", layout="centered")
 
+# this page is text only
 st.title("About this tool")
 
 st.header("Purpose")
 st.markdown("""
 A formal autism diagnosis needs long assessments by specialists, and waiting lists are long.
 Short screening questionnaires help decide who should be referred. This tool combines such a
-questionnaire with an interpretable machine learning model and shows **why** it gave its answer.
+questionnaire with a machine learning model that can be explained, and shows **why** the model gave its answer.
+
+This tool is a **research demonstration**. The questionnaire score is the main result. The model is shown
+next to it to demonstrate how its reasoning can be made visible.
 """)
 
 st.header("Data")
@@ -28,11 +32,11 @@ models work on data from a different source.
 st.header("Method")
 st.markdown("""
 Logistic Regression, Random Forest, XGBoost, LightGBM, the Explainable Boosting Machine (EBM)
-and TabPFN were compared using the same leakage-aware pipeline for each age group. Because the
-full questionnaire lets a model recover the scoring rule exactly, the models were also tested with
-only 4, 6 or 8 of the questions and with 5–20% of answers flipped at random; the **Model Performance**
-page shows both. Explanations use SHAP values, which show how much each answer moved the estimate
-up or down for this person.
+and TabPFN were compared in the same way for each age group. Care was taken that no information from the
+test data reached the models during training (this problem is called *leakage*). With the full questionnaire
+a model can simply learn the scoring rule, so the models were also tested with only 4, 6 or 8 of the questions
+and with 5–20% of the answers changed at random. The **Model Performance** page shows both. The explanations
+use SHAP values, which show how much each answer moved the model's number up or down for this person.
 """)
 
 st.header("Limitations")
@@ -46,8 +50,14 @@ st.markdown("""
 * A low result does not rule autism out. A high result does not confirm it.
 """)
 
-st.header("Privacy")
-st.markdown("Answers are processed in memory to produce the result and are never stored or logged.")
+st.header("Privacy and responsible use")
+st.markdown("""
+* Your answers are only used to make the result on the screen. They are never stored or logged.
+* The tool does not ask for a name or anything else that could identify a person.
+* This is a student research project. It is **not a medical device** and has not been approved for clinical use.
+* It must not be used to decide about a diagnosis, treatment or support. Only a qualified clinician can do that.
+* The training data is public and anonymous. It was collected by other researchers.
+""")
 
 st.header("References")
 st.markdown("""
