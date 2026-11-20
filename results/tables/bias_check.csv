@@ -1,0 +1,31 @@
+group,model,attribute,value,records,positives,negatives,recall,false positive rate
+toddler,EBM,gender,female,291.0,188.0,103.0,1.0,0.0
+toddler,EBM,gender,male,682.0,502.0,180.0,1.0,0.0
+toddler,EBM,ethnicity,Asian,272.0,198.0,74.0,1.0,0.0
+toddler,EBM,ethnicity,Black,48.0,36.0,12.0,1.0,0.0
+toddler,EBM,ethnicity,Hispanic,37.0,29.0,8.0,1.0,0.0
+toddler,EBM,ethnicity,Latino,26.0,20.0,6.0,1.0,0.0
+toddler,EBM,ethnicity,Middle Eastern,167.0,94.0,73.0,1.0,0.0
+toddler,EBM,ethnicity,Other/Unknown,52.0,44.0,8.0,1.0,0.0
+toddler,EBM,ethnicity,South Asian,60.0,37.0,23.0,1.0,0.0
+toddler,EBM,ethnicity,White European,311.0,232.0,79.0,1.0,0.0
+child,EBM,gender,female,83.0,37.0,46.0,1.0,0.0
+child,EBM,gender,male,197.0,96.0,101.0,1.0,0.0
+child,EBM,ethnicity,Asian,44.0,21.0,23.0,1.0,0.0
+child,EBM,ethnicity,Middle Eastern,26.0,8.0,18.0,1.0,0.0
+child,EBM,ethnicity,Other/Unknown,85.0,38.0,47.0,1.0,0.0
+child,EBM,ethnicity,South Asian,21.0,8.0,13.0,1.0,0.0
+child,EBM,ethnicity,White European,104.0,58.0,46.0,1.0,0.0
+adolescent,Logistic Regression,gender,female,52.0,34.0,18.0,0.9607843137254902,0.24074074074074073
+adolescent,Logistic Regression,gender,male,49.0,26.0,23.0,0.9871794871794872,0.10144927536231885
+adolescent,Logistic Regression,ethnicity,Other/Unknown,62.0,31.0,31.0,0.956989247311828,0.10752688172043011
+adolescent,Logistic Regression,ethnicity,White European,39.0,29.0,10.0,0.9885057471264368,0.3333333333333333
+adult,EBM,gender,female,332.0,102.0,230.0,1.0,0.0
+adult,EBM,gender,male,359.0,83.0,276.0,1.0,0.0
+adult,EBM,ethnicity,Asian,123.0,16.0,107.0,1.0,0.0
+adult,EBM,ethnicity,Black,43.0,18.0,25.0,1.0,0.0
+adult,EBM,ethnicity,Latino,20.0,10.0,10.0,1.0,0.0
+adult,EBM,ethnicity,Middle Eastern,90.0,8.0,82.0,1.0,0.0
+adult,EBM,ethnicity,Other/Unknown,152.0,25.0,127.0,1.0,0.0
+adult,EBM,ethnicity,South Asian,36.0,3.0,33.0,1.0,0.0
+adult,EBM,ethnicity,White European,227.0,105.0,122.0,1.0,0.0

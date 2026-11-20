@@ -1,0 +1,7 @@
+dataset,records,ASD traits,no ASD traits,% ASD traits
+toddler,973,690,283,70.9
+child,280,133,147,47.5
+adolescent,101,60,41,59.4
+adult,691,185,506,26.8
+toddler_saudi,443,306,137,69.1
+adult_kaggle,606,129,477,21.3
